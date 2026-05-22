@@ -3,6 +3,15 @@ import numpy as np
 from sentence_transformers import SentenceTransformer
 import faiss
 import ollama
+import os
+import ssl
+
+# Для Ubuntu/Debian
+system_ca_bundle = '/etc/ssl/certs/ca-certificates.crt'
+if os.path.exists(system_ca_bundle):
+    os.environ['SSL_CERT_FILE'] = system_ca_bundle
+    os.environ['REQUESTS_CA_BUNDLE'] = system_ca_bundle
+    os.environ['CURL_CA_BUNDLE'] = system_ca_bundle
 
 """
 Простой чат-бот магазина в стиле RAG (Retrieval-Augmented Generation):
@@ -18,7 +27,7 @@ import ollama
 SCORE_THRESHOLD = 0.80
 
 # ------------------ Поиск ------------------
-def build_index(csv_path='products.csv', model_name='intfloat/multilingual-e5-base'):
+def build_index(csv_path='products_b2b.csv', model_name = 'embaas/sentence-transformers-multilingual-e5-base'):
     # Загружаем модель, которая превращает текст в векторы (эмбеддинги).
     print("Загружаю модель эмбеддингов...")
     model = SentenceTransformer(model_name)
@@ -121,7 +130,7 @@ def ask_ollama(user_query, products_df=None, model_name='qwen2.5:7b'):
 if __name__ == "__main__":
     # Один раз при старте строим индекс по товарам.
     print("Инициализация поисковика...")
-    model, index, df = build_index('products.csv')
+    model, index, df = build_index('products_b2b.csv')
 
     print("\n" + "="*50)
     print("Чат-бот готов! Задайте вопрос или введите 'выход'.")
